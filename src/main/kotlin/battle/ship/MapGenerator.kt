@@ -7,6 +7,12 @@ class MapGenerator {
         UP, DOWN, RIGHT, LEFT;
     }
 
+    fun empty(): BattleshipMap {
+        val mapSize = 10
+        val arr = MutableList(mapSize) { MutableList(mapSize) { -2 } }
+        return BattleshipMap(arr, mapSize)
+    }
+
     fun generate(): BattleshipMap {
 
         fun validateCoordinates(i: Int, j: Int, shipType: Int, arr: MutableList<MutableList<Int>>) {
@@ -124,24 +130,45 @@ class MapGenerator {
 
         }
 
+        for (i in 0 until mapSize) {
+            for (j in 0 until mapSize) {
+                arr[i][j] = when (arr[i][j]) {
+                    in 7..10 -> 1
+                    in 4..6 -> 2
+                    in 2..3 -> 3
+                    1 -> 4
+                    else -> 0
+                }
+            }
+        }
 
         return BattleshipMap(arr, mapSize)
     }
 }
 
-data class BattleshipMap(private val map: List<List<Int>>, val size: Int) {
+data class BattleshipMap(private var map: MutableList<MutableList<Int>>, val size: Int) {
 
     private val EMPTY_CELL_SYMBOL = '□'
     private val FILLED_CELL_SYMBOL = '■'
 
     operator fun get(i: Int, j: Int) = map[i][j]
+    operator fun set(i: Int, j: Int, value: Int) {
+        map[i][j] = value
+    }
+
     override fun toString(): String {
 
+        val mapOf = mapOf(0 to EMPTY_CELL_SYMBOL, -1 to 'X', -2 to '?')
 
-        val sb = StringBuilder()
+        val sb = StringBuilder("  ")
+        for (i in 0..9) {
+            sb.append("$i ")
+        }
+        sb.append("\n")
         for (i in 0 until size) {
+            sb.append((i+65).toChar()).append(" ")
             for (k in 0 until size) {
-                val i1 = if (map[i][k] == 0) EMPTY_CELL_SYMBOL else FILLED_CELL_SYMBOL
+                val i1 = mapOf.getOrDefault(this.map[i][k], FILLED_CELL_SYMBOL)
                 sb.append("$i1 ")
             }
             sb.append("\n")
